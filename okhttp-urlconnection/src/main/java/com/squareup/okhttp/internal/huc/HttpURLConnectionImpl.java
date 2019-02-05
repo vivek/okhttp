@@ -240,6 +240,23 @@ public class HttpURLConnectionImpl extends HttpURLConnection {
     // text/html this has changed to return FileNotFoundException for all
     // file types
     if (getResponseCode() >= HTTP_BAD_REQUEST) {
+      Platform.get().log("HTTP Headers:\n");
+      for (Map.Entry<String, List<String>> entry : response.getResponse()
+              .headers().toMultimap().entrySet()) {
+        StringBuilder sb = new StringBuilder();
+        List<String> value = entry.getValue();
+        for (int i = 0; i < value.size(); i++) {
+          sb.append(value.get(i));
+          if (i == value.size() - 1) {
+            sb.append(",");
+          }
+        }
+        Platform.get().log(String.format("%s: %s", entry.getKey(), sb.toString()));
+      }
+
+      Platform.get().log(String.format("Server returned http error code: %s and error message: %s",
+              getResponseCode(), response.getResponse().body().string()));
+
       throw new FileNotFoundException(url.toString());
     }
 
